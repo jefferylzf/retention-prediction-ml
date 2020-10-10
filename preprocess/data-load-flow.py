@@ -35,7 +35,7 @@ churn_df = pd.read_csv(("../raw-data/0903/{}").format(churn_param['input-data-na
 churn_df['pvp-unlock'] = 0
 churn_df['hunt-unlock'] = 0
 churn_df['exp-unlock'] = 0
-churn_df['label'] = retain_param['bool_churn']
+churn_df['label'] = churn_param['bool_churn']
 
 for idx in range(len(churn_df)):
     lv = churn_df.loc[idx, 'level_cnt1'] + churn_df.loc[idx, 'level_cnt2'] + churn_df.loc[idx, 'level_cnt3']
@@ -51,6 +51,7 @@ for idx in range(len(churn_df)):
 
 
 res = pd.concat([churn_df,retain_df],axis=0,ignore_index=True)
+res.replace(np.nan,0, inplace=True)
 res.to_csv(('../train-data/merged_global_{}_raw.csv').format(date))
 
 # csv_file.to_csv(('../inter-data/0903/{}').format(param['output-data-name']))
