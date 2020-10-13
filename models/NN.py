@@ -10,12 +10,14 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-df=pd.read_csv("../raw-data/merged_d5-d7_global_0902_raw.csv")
+# param
+model_name = 'MLP-fulltrain'
+df=pd.read_csv("../train-data/withNewFeatures/merged_02-08.csv")
 
-x = df.iloc[:,0:-1].values
+x = df.iloc[:,4:-1].values
 y = df.iloc[:,-1].values
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.3, random_state = 0)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.05, random_state = 0)
 
 # standardize
 sc_x = StandardScaler()
@@ -27,19 +29,19 @@ y_test = keras.utils.to_categorical(y_test, 2)
 
 model = Sequential()
 
-model.add(Dense(580, input_shape=(len(xtrain[0]),))) # 全连接层
+model.add(Dense(512, input_shape=(len(xtrain[0]),))) # 全连接层
 
 model.add(Activation('relu')) # ReLU
 
 model.add(Dropout(0.2)) # Dropout
 
-model.add(Dense(290)) # 全连接层
+model.add(Dense(256)) # 全连接层
 
 model.add(Activation('relu')) # ReLU
 
 model.add(Dropout(0.2)) # Dropout
 
-model.add(Dense(174)) # 全连接层
+model.add(Dense(73)) # 全连接层
 
 model.add(Activation('relu')) # ReLU
 
@@ -57,4 +59,12 @@ model.compile(loss='categorical_crossentropy',
 
               metrics=['accuracy'])
 
-history = model.fit(xtrain, y_train, batch_size=100, validation_data=(xtest, y_test), epochs=40, verbose=1)
+history = model.fit(xtrain, y_train, batch_size=100, validation_data=(xtest, y_test), epochs=20, verbose=1)
+
+model.save('./models_file/{}'.format(model_name))
+from sklearn.metrics import classification_report
+import numpy as np
+y_pred = model.predict(xtest, batch_size=64, verbose=1)
+y_pred_bool = np.argmax(y_pred, axis=1)
+y_test_bool = np.argmax(y_test, axis = 1)
+print(classification_report(y_test_bool, y_pred_bool))

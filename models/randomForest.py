@@ -12,34 +12,43 @@ from sklearn.metrics import roc_curve, roc_auc_score, auc
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler
 
-df=pd.read_csv("../train-data/merged_72h_global_0902_raw.csv")
+df=pd.read_csv("../train-data/withNewFeatures/merged_02-08.csv")
 
-testdf = pd.read_csv("../train-data/merged_global_0903_raw.csv")
-x = df.iloc[:,0:-1].values
+testdf = pd.read_csv("../train-data/withNewFeatures/merged_global_0927_clear.csv")
+x = df.iloc[:, 4:-1].values
 y = df.iloc[:,-1].values
 
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.3, random_state = 0)
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.1, random_state = 7)
 
-rf=RandomForestClassifier(max_depth=20, min_samples_leaf=18, n_estimators=200,
+rf=RandomForestClassifier(max_depth=20, min_samples_leaf=18, n_estimators=300,
                        random_state =0)
 rf.fit(X_train,y_train)
+from joblib import dump, load
+dump(rf, './models_file/randomforest-fulltrain.joblib')
 
 from sklearn.metrics import f1_score
 from sklearn.metrics import classification_report
-
-x_0903 = testdf.iloc[:,0:-1].values
-y_0903 = testdf.iloc[:,-1].values
-
-y_pred = rf.predict(x_0903)
 target_names = ['retain', 'churn']
 
-print(classification_report(y_0903, y_pred, target_names=target_names))
+x_new = testdf.iloc[:,2:-1].values
+y_new = testdf.iloc[:,-1].values
+y_newpred = rf.predict(x_new)
+
+print('----------test for another---------')
+print(classification_report(y_new, y_newpred, target_names=target_names))
+
+
+# print('----------test for test set---------')
+# y_pred = rf.predict(X_test)
+# print(classification_report(y_test, y_pred, target_names=target_names))
+
+
 
 # print('f1 score:')
 # print(f1_score(y_test, y_pred, average='macro'))
 #
-# print('accuracy:')
-# print(rf.score(X_test, y_test))
+print('accuracy:')
+print(rf.score(X_test, y_test))
 
 importances = rf.feature_importances_
 std = np.std([tree.feature_importances_ for tree in rf.estimators_],
@@ -51,10 +60,10 @@ feature_name = ['level_cnt','ads_cnt','pvp_cnt','pvp_won_cnt','gem_spend','coin_
                 'log_num',	'd1_duration',	'd2_duration',	'd3_duration',	'willpay',	'daily_task_cnt',
                 'pvp-unlock',	'hunt-unlock',	'exp-unlock']
 # Print the feature ranking
-# print("Feature ranking:")
-#
-# for f in range(X_train.shape[1]):
-#     print("%d. feature %s (%f)" % (f + 1, indices[f], importances[indices[f]]))
+print("Feature ranking:")
+
+for f in range(X_train.shape[1]):
+    print("%d. feature %s (%f)" % (f + 1, indices[f], importances[indices[f]]))
 
 # Plot the impurity-based feature importances of the forest
 plt.figure()

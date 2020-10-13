@@ -1,15 +1,30 @@
-start_date = '20200905'
-end_date = str(int(start_date)+6)
-start_date_2 = str(int(start_date)+2)
-start_date_4 = str(int(start_date)+4)
-start_date_6 = str(int(start_date)+6)
-start_date_7 = str(int(start_date)+7)
-start_date_8 = str(int(start_date)+8)
-start_date_9 = str(int(start_date)+9)
-start_date_13 = str(int(start_date)+13)
+import datetime
+
+start_date = datetime.date(2020,9,28)
+
+end_date = start_date + datetime.timedelta(10)
+start_date_2 = start_date + datetime.timedelta(2)
+start_date_4 = start_date + datetime.timedelta(4)
+start_date_6 = start_date + datetime.timedelta(6)
+start_date_7 = start_date + datetime.timedelta(7)
+start_date_8 = start_date + datetime.timedelta(8)
+start_date_9 = start_date + datetime.timedelta(9)
+start_date_13 = start_date + datetime.timedelta(13)
+
+start_date = str(start_date).replace('-', '')
+end_date = str(end_date).replace('-', '')
+
+start_date_2 = str(start_date_2).replace('-', '')
+start_date_4 = str(start_date_4).replace('-', '')
+start_date_6 = str(start_date_6).replace('-', '')
+start_date_7 = str(start_date_7).replace('-', '')
+start_date_8 = str(start_date_8).replace('-', '')
+start_date_9 = str(start_date_9).replace('-', '')
+start_date_13 = str(start_date_13).replace('-', '')
+
 sql_string = f'''# 流失用户（准确）
 
-CREATE TABLE tmp.churn_1009
+CREATE TABLE tmp.churn_{start_date}
 WITH (
   format='PARQUET'
 ) AS
@@ -54,7 +69,7 @@ GROUP BY t1.gaid
 
 
 # 留存用户（准确）
-CREATE TABLE tmp.retained_1009
+CREATE TABLE tmp.retain_{start_date}
 WITH (
   format='PARQUET'
 ) AS
